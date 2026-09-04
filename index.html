@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Match Predictor</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background-color: #0f172a; color: #fff; padding: 20px; margin: 0; }
+        .card { background-color: #1e293b; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 1px solid #334155; }
+        h2 { text-align: center; color: #38bdf8; margin-top: 0; }
+        label { display: block; margin-top: 15px; color: #94a3b8; font-size: 14px; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background-color: #0f172a; color: #fff; font-size: 16px; box-sizing: border-box; margin-top: 5px; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 8px; background-color: #0284c7; color: white; font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        .result { margin-top: 20px; padding: 15px; background-color: #0f172a; border-radius: 8px; border-left: 4px solid #38bdf8; display: none; }
+        .green { color: #4ade80; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>AI Match Predictor</h2>
+    
+    <label>xG Gazde (Goluri Așteptate):</label>
+    <input type="number" id="xgHome" step="0.1" value="1.6">
+    
+    <label>xG Oaspeți (Goluri Așteptate):</label>
+    <input type="number" id="xgAway" step="0.1" value="1.2">
+    
+    <button onclick="calculeaza()">Calculează Pronostic</button>
+
+    <div id="result" class="result">
+        <p>Peste 2.5 Goluri: <span id="probPeste" class="green">0%</span></p>
+        <p>Sub 2.5 Goluri: <span id="probSub">0%</span></p>
+        <p>Cotă Minimă Valoare (+EV): <span id="cota" class="green">0.00</span></p>
+    </div>
+</div>
+
+<script>
+function factorial(n) { return (n <= 1) ? 1 : n * factorial(n - 1); }
+function poisson(k, l) { return (Math.pow(l, k) * Math.exp(-l)) / factorial(k); }
+
+function calculeaza() {
+    let home = parseFloat(document.getElementById('xgHome').value);
+    let away = parseFloat(document.getElementById('xgAway').value);
+    let sub = 0;
+
+    for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
+            if (i + j <= 2.5) sub += poisson(i, home) * poisson(j, away);
+        }
+    }
+
+    let peste = 1 - sub;
+    document.getElementById('probSub').innerText = (sub * 100).toFixed(1) + '%';
+    document.getElementById('probPeste').innerText = (peste * 100).toFixed(1) + '%';
+    document.getElementById('cota').innerText = (1 / peste).toFixed(2);
+    document.getElementById('result').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
